@@ -12,6 +12,8 @@ namespace JellyPresence.Project
         {
             JellyPresence j = new JellyPresence();
             JellyPresence.StartJMP();
+            j.StartDiscordUpdate();
+            while (true) ;
         }
     }
 }
