@@ -45,7 +45,6 @@ namespace JellyPresence.Project
 
         private void UpdateEvent(Object s, ElapsedEventArgs e)
         {
-            // Query jellyfin for data
             client.RunCallbacks();
         }
     }

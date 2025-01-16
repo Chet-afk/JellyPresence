@@ -1,20 +1,21 @@
 ﻿
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Timers;
 
 namespace JellyPresence.Project
 {
     public class JellyPresenceApp
     {
-        bool instanceOpen = true;
+
 
         public static void Main()
         {
             JellyPresence j = new JellyPresence();
             JellyPresence.StartJMP();
 
-            Timer t = new Timer(2000);
+            System.Timers.Timer t = new System.Timers.Timer(2000);
             t.Elapsed += UpdateEvent;
             t.AutoReset = true;
             t.Start();
@@ -28,6 +29,7 @@ namespace JellyPresence.Project
         {
             if (Process.GetProcessesByName("JellyfinMediaPlayer").Length == 0)
             {
+
                 Environment.Exit(0);
             }
         }

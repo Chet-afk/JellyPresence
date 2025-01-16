@@ -4,6 +4,7 @@ using System;
 using dotenv.net;
 using System.Timers;
 using Discord;
+using System.Threading;
 
 namespace JellyPresence.Project
 {
@@ -25,7 +26,7 @@ namespace JellyPresence.Project
             }
 
             discordManager = new DiscordManager(long.Parse(envDict["CLIENTID"]));
-            jellyfinManager = new JellyfinManager(envDict["JELLYFINAPIKEY"]);
+            jellyfinManager = new JellyfinManager(envDict["JELLYAPIKEY"], envDict["JELLYURL"]);
         }
 
         public static void StartJMP() 
@@ -33,6 +34,14 @@ namespace JellyPresence.Project
             Process process = new Process();
             process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
             process.Start();
+        }
+
+        // Create an timer to 
+        // query jellymanager and update discordmanager activity
+
+        private void UpdateEvent(Object s, ElapsedEventArgs e)
+        {
+            
         }
 
     }
