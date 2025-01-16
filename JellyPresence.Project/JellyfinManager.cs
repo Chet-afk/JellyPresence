@@ -41,36 +41,45 @@ namespace JellyPresence.Project
                 HttpResponseMessage r = await client.GetAsync(serverURL + "/Devices?apikey=" + APIKEY);
                 r.EnsureSuccessStatusCode();
                 string s = await r.Content.ReadAsStringAsync();
+
                 ItemsJSON i = JsonSerializer.Deserialize<ItemsJSON>(s);
-                Console.WriteLine(i);
+                foreach (DevicesJSON d in i.Items)
+                {
+                    if (d.Name == deviceName)
+                    {
+                        deviceJellyID = d.Id;
+                    }
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e.Message}");
             }
 
-            //while (true)
-            //{
-            //    await Task.Delay(TimeSpan.FromSeconds(3));
-            //    try
-            //    {
-            //        HttpResponseMessage r = await client.GetAsync(serverURL + "/Sessions?apikey=" + APIKEY);
-            //        r.EnsureSuccessStatusCode();
-            //        string b = await r.Content.ReadAsStringAsync();
-            //        Console.WriteLine(b);
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(3));
+                try
+                {
+                    HttpResponseMessage r = await client.GetAsync(serverURL + "/Sessions?deviceId=" + deviceJellyID 
+                        + "&apikey=" + APIKEY);
+                    r.EnsureSuccessStatusCode();
+                    string b = await r.Content.ReadAsStringAsync();
+                    Console.WriteLine(b);
 
-            //    }
-            //    catch (HttpRequestException e)
-            //    {
-            //        Console.WriteLine($"{e.Message}");
-            //    }
-            //}
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"{e.Message}");
+                }
+            }
         }
     }
 
+    // Classes to hold json return vals
     public class ItemsJSON
     {
-        public IList<DevicesJSON> Items { get; set; }
+        public IEnumerable<DevicesJSON> Items { get; set; }
     }
 
     public class DevicesJSON
