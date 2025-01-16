@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
@@ -45,6 +48,8 @@
     <Compile Include="DiscordGame SDK\LobbyManager.cs" />
     <Compile Include="DiscordGame SDK\StorageManager.cs" />
     <Compile Include="DiscordGame SDK\StoreManager.cs" />
+    <Compile Include="DiscordManager.cs" />
+    <Compile Include="JellyfinManager.cs" />
     <Compile Include="JellyPresence.cs" />
     <Compile Include="JellyPresenceApp.cs" />
   </ItemGroup>

@@ -11,13 +11,10 @@ namespace JellyPresence.Project
     {
 
         private readonly IDictionary<string, string> envDict;
+        private DiscordManager discordManager;
+        private JellyfinManager jellyfinManager;
 
         private string jmpPath;
-        private long clientID;
-
-        private Discord.Discord client;
-        private ActivityManager actManager;
-        private Activity activity = new Discord.Activity();
 
         public JellyPresence()
         {
@@ -27,12 +24,8 @@ namespace JellyPresence.Project
                 throw new InvalidENVException("ENV Invalid");
             }
 
-            clientID = long.Parse(envDict["CLIENTID"]);
-
-            // maybe change to json so dont gotta convert to long lol
-            client = new Discord.Discord(clientID, (UInt64)Discord.CreateFlags.Default);
-            actManager = client.GetActivityManager();
-
+            discordManager = new DiscordManager(long.Parse(envDict["CLIENTID"]));
+            jellyfinManager = new JellyfinManager(envDict["JELLYFINAPIKEY"]);
         }
 
         public static void StartJMP() 
@@ -40,30 +33,6 @@ namespace JellyPresence.Project
             Process process = new Process();
             process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
             process.Start();
-        }
-
-
-        public void StartDiscordUpdate()
-        {
-            activity.State = "Test";
-            activity.Details = "Details testing";
-            actManager.UpdateActivity(activity, (res) =>
-            {
-                if (res == Discord.Result.Ok)
-                {
-                    Console.WriteLine("OK");
-                }
-            });
-
-            var timer = new Timer(500);
-            timer.Elapsed += UpdateEvent;
-            timer.AutoReset = true;
-            timer.Start();
-        }
-
-        public void UpdateEvent(Object s, ElapsedEventArgs e)
-        {
-            client.RunCallbacks();
         }
 
     }
