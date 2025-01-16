@@ -31,7 +31,7 @@ namespace JellyPresence.Project
         {
             activity.State = userActivity;
             activity.Details = showTitle;
-
+            activity.Timestamps = timeRemaining;
         }
 
 
