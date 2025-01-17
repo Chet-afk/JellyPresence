@@ -3,8 +3,7 @@ using System.Diagnostics;
 using System;
 using dotenv.net;
 using System.Timers;
-using Discord;
-using System.Threading;
+
 
 namespace JellyPresence.Project
 {
@@ -27,6 +26,7 @@ namespace JellyPresence.Project
 
             discordManager = new DiscordManager(long.Parse(envDict["CLIENTID"]));
             jellyfinManager = new JellyfinManager(envDict["JELLYAPIKEY"], envDict["JELLYURL"]);
+            UpdateInfo();
         }
 
         public static void StartJMP() 
@@ -37,10 +37,25 @@ namespace JellyPresence.Project
         }
 
         // Create an timer to 
-        // query jellymanager and update discordmanager activity
+        // update discord activity stuff
+        private void UpdateInfo()
+        {
+            var timer = new Timer(1000);
+            timer.Elapsed += UpdateEvent;
+            timer.AutoReset = true;
+            timer.Start();
+        }
 
         private void UpdateEvent(Object s, ElapsedEventArgs e)
         {
+            if (jellyfinManager.p == null) { }
+            else
+            {
+                discordManager.SetActivity("Watching " + jellyfinManager.p.NowPlayingItem.SeriesName,
+                    "Episode: " + jellyfinManager.p.NowPlayingItem.Name,
+                    jellyfinManager.p.PlayState.PositionTicks,
+                    jellyfinManager.p.NowPlayingItem.RunTimeTicks);
+            }
             
         }
 

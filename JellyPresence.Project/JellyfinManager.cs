@@ -18,7 +18,7 @@ namespace JellyPresence.Project
         private readonly string deviceName = Environment.MachineName;
         private string deviceJellyID;
 
-        private string title;
+        public PlaybackJSON p = null;
 
         private HttpClient client = new HttpClient(); 
 
@@ -60,7 +60,7 @@ namespace JellyPresence.Project
 
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                
                 try
                 {
                     HttpResponseMessage r = await client.GetAsync(serverURL + "/Sessions?deviceId=" + deviceJellyID 
@@ -72,13 +72,14 @@ namespace JellyPresence.Project
                     // to the actual information. This just removes the array portion
                     b = b.Substring(1, b.Length-2);
                     
-                    PlaybackJSON p = JsonSerializer.Deserialize<PlaybackJSON>(b);
-                    Console.WriteLine(p.NowPlayingItem.Name + " " + p.PlayState.PositionTicks);
+                    p = JsonSerializer.Deserialize<PlaybackJSON>(b);
                 }
                 catch (HttpRequestException e)
                 {
                     Console.WriteLine($"{e.Message}");
                 }
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
     }
@@ -103,6 +104,8 @@ namespace JellyPresence.Project
     }
     public class PlaystateJSON
     {
+        // Ticks in jellyfin api calls are in microseconds
+        // but also multipled by 10 (idk why?????)
         public long PositionTicks {  get; set; }
         public bool IsPaused {  get; set; }
     }
@@ -110,9 +113,12 @@ namespace JellyPresence.Project
     {
         // Episode name
         public string Name { get; set; }
-        public long RunTimeTicks { get; set; }
+        // Show name
         public string SeriesName { get; set; }
-        public string SeriesId {  get; set; }
+
+        public string SeriesId { get; set; }
+        public long RunTimeTicks { get; set; }
+        
         // Just in case need it for later
         //public string Id { get; set; }
     }
