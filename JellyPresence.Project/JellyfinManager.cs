@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -18,7 +20,10 @@ namespace JellyPresence.Project
         private readonly string deviceName = Environment.MachineName;
         private string deviceJellyID;
 
-        public PlaybackJSON p = null;
+        private readonly HttpRequestMessage getDevice;
+        private HttpRequestMessage getInfo;
+
+        public PlaybackJSON p;
 
         private HttpClient client = new HttpClient(); 
 
@@ -27,21 +32,29 @@ namespace JellyPresence.Project
         {
             APIKEY = apiKey;
             serverURL = jellyfinURL;
-
-
-            // Discard to stop CS4014 warning
-            // Fire and forget lets goooooo
-            _ = QueryServer();
+            getDevice = new HttpRequestMessage(HttpMethod.Get, serverURL + "/Devices?apikey=" + APIKEY);
         }
 
-        private async Task QueryServer()
+        public bool MissingFields()
         {
-            // First get current machines device ID for easier filtering
+            // True = not viewing anything / haven't claimed all info
+            if (p is null) {  return true; }
+            else if (p.PlayState is null || 
+                p.NowPlayingItem is null ||
+                p.NowPlayingItem.SeriesName is null ||
+                p.NowPlayingItem.Name is null ||
+                p.NowPlayingItem.SeriesId is null ||
+                p.NowPlayingItem.RunTimeTicks == 0) { return true; }
+            return false;
+        }
+
+        public void QueryServerDevice()
+        {
             try
             {
-                HttpResponseMessage r = await client.GetAsync(serverURL + "/Devices?apikey=" + APIKEY);
+                HttpResponseMessage r = client.Send(getDevice);
                 r.EnsureSuccessStatusCode();
-                string s = await r.Content.ReadAsStringAsync();
+                string s = new StreamReader(r.Content.ReadAsStream()).ReadToEnd();
 
                 ItemsJSON i = JsonSerializer.Deserialize<ItemsJSON>(s);
                 foreach (DevicesJSON d in i.Items)
@@ -49,6 +62,7 @@ namespace JellyPresence.Project
                     if (d.Name == deviceName)
                     {
                         deviceJellyID = d.Id;
+                        
                     }
                 }
             }
@@ -56,29 +70,29 @@ namespace JellyPresence.Project
             {
                 Console.WriteLine($"{e.Message}");
             }
+        }
 
-            while (true)
+        public void QueryServer()
+        {
+
+            getInfo = new HttpRequestMessage(HttpMethod.Get, 
+                serverURL + "/Sessions?deviceId=" + deviceJellyID + "&apikey=" + APIKEY);
+
+            try
             {
-                
-                try
-                {
-                    HttpResponseMessage r = await client.GetAsync(serverURL + "/Sessions?deviceId=" + deviceJellyID 
-                        + "&apikey=" + APIKEY);
-                    r.EnsureSuccessStatusCode();
-                    string b = await r.Content.ReadAsStringAsync();
+                HttpResponseMessage r = client.Send(getInfo);
+                r.EnsureSuccessStatusCode();
+                string b = new StreamReader(r.Content.ReadAsStream()).ReadToEnd();
 
-                    // I dont know why but the json is wrapped in an array of size 1 before getting
-                    // to the actual information. This just removes the array portion
-                    b = b.Substring(1, b.Length-2);
-                    
-                    p = JsonSerializer.Deserialize<PlaybackJSON>(b);
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine($"{e.Message}");
-                }
+                // I dont know why but the json is wrapped in an array of size 1 before getting
+                // to the actual information. This just removes the array portion
+                b = b.Substring(1, b.Length - 2);
 
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                p = JsonSerializer.Deserialize<PlaybackJSON>(b);
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"{e.Message}");
             }
         }
     }
@@ -106,17 +120,17 @@ namespace JellyPresence.Project
         // Ticks in jellyfin api calls are in microseconds
         // but also multipled by 10 (idk why?????)
         public long PositionTicks {  get; set; }
-        public bool IsPaused {  get; set; }
+        public bool IsPaused { get; set; }
     }
     public class NowPlayingItemJSON
     {
         // Episode name
-        public string Name { get; set; }
+        public string Name { get; set; } = null;
         // Show name
-        public string SeriesName { get; set; }
+        public string SeriesName { get; set; } = null;
 
-        public string SeriesId { get; set; }
-        public long RunTimeTicks { get; set; }
+        public string SeriesId { get; set; } = null;
+        public long RunTimeTicks { get; set; } = 0;
         
         // Just in case need it for later
         //public string Id { get; set; }

@@ -21,7 +21,7 @@ namespace JellyPresence.Project
                 config.GetVal("JELLYURL"));
 
 
-
+            jMan.QueryServerDevice();
 
             Process process = new Process();
             process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
@@ -29,17 +29,17 @@ namespace JellyPresence.Project
 
             while (true)
             {
+                
                 if (Process.GetProcessesByName("JellyfinMediaPlayer").Length == 0)
                 {
                     client.Dispose();
                     Environment.Exit(0);
                 }
 
+                jMan.QueryServer();
                 // Sleep the thread when changing activity values
                 // Otherwise protected memory clashes will happen
-                if (jMan.p == null || 
-                    jMan.p.NowPlayingItem.SeriesName == null || 
-                    jMan.p.NowPlayingItem.Name == null) { }
+                if (jMan.MissingFields()) { }
                 else
                 {
                     string series = jMan.p.NowPlayingItem.SeriesName;
