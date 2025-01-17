@@ -42,14 +42,17 @@ namespace JellyPresence.Project
                     jMan.p.NowPlayingItem.Name == null) { }
                 else
                 {
-                    dMan.SetActivity(client, "Watching " + jMan.p.NowPlayingItem.SeriesName,
-                            "Episode: " + jMan.p.NowPlayingItem.Name,
-                            jMan.p.PlayState.PositionTicks,
-                            jMan.p.NowPlayingItem.RunTimeTicks);
+                    string series = jMan.p.NowPlayingItem.SeriesName;
+                    string episode = jMan.p.NowPlayingItem.Name;
+                    long cur_pos = jMan.p.PlayState.PositionTicks;
+                    long runtime = jMan.p.NowPlayingItem.RunTimeTicks;
+                    dMan.SetActivity(client, "Watching " + series,
+                            "Episode: " + episode,
+                            cur_pos,
+                            runtime);
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
                 client.RunCallbacks();
-                Thread.Sleep(500);
 
 
 

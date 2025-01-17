@@ -12,7 +12,7 @@ namespace JellyPresence.Project
     public class JellyPresence
     {
 
-        private readonly IDictionary<string, string> envDict;
+        //private readonly IDictionary<string, string> envDict;
         private DiscordManager discordManager;
         private JellyfinManager jellyfinManager;
 
@@ -21,7 +21,7 @@ namespace JellyPresence.Project
         public JellyPresence()
         {
 
-            jellyfinManager = new JellyfinManager(envDict["JELLYAPIKEY"], envDict["JELLYURL"]);
+            //jellyfinManager = new JellyfinManager(envDict["JELLYAPIKEY"], envDict["JELLYURL"]);
             UpdateInfo();
         }
 

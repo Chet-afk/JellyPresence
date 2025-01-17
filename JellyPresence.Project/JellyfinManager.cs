@@ -36,7 +36,6 @@ namespace JellyPresence.Project
 
         private async Task QueryServer()
         {
-
             // First get current machines device ID for easier filtering
             try
             {
