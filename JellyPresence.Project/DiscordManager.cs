@@ -9,31 +9,31 @@ namespace JellyPresence.Project
     public class DiscordManager
     {
         private DateTime epochStart = new DateTime(1970, 1, 1);
+        private ActivityManager actMan;
+        private Activity activity = new Activity();
+        private ActivityTimestamps activityTimestamps = new ActivityTimestamps();
 
-
-        public DiscordManager()
+        public DiscordManager(Discord.Discord client)
         {
+            this.actMan = client.GetActivityManager();
         }
 
         //TODO: Add image changing (once imgur api implemented?)
-        public void SetActivity(Discord.Discord client, string showTitle, string userActivity,
+        public void SetActivity(string showTitle, string userActivity,
             long currentTime, long runtime)
         {
 
-            ActivityManager actMan = client.GetActivityManager();
-
-            Activity activity = new Activity();
             activity.State = userActivity;
             activity.Details = showTitle;
 
-            //long endTimeEpoch = (runtime - currentTime) / 10;
-            //long currentTimeEpoch = (long)DateTime.UtcNow.Subtract(epochStart).TotalSeconds;
+            long endTimeEpoch = (runtime - currentTime) / 10;
+            long currentTimeEpoch = (long)DateTime.UtcNow.Subtract(epochStart).TotalSeconds;
 
-            //activityTimestamps.End = endTimeEpoch + currentTimeEpoch;
+            activityTimestamps.End = endTimeEpoch + currentTimeEpoch;
 
-            //activity.Timestamps = activityTimestamps;
+            activity.Timestamps = activityTimestamps;
 
-
+            Console.WriteLine(activity.Timestamps.End);
 
             actMan.UpdateActivity(activity, (res) =>
             {

@@ -11,21 +11,24 @@ namespace JellyPresence.Project
 
         public static void Main()
         {
+
             Config config = new Config();
+
+            Process process = new Process();
+            process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
+            process.Start();
 
             Discord.Discord client = new Discord.Discord(long.Parse(config.GetVal("CLIENTID")), 
                 (UInt64)Discord.CreateFlags.Default);
 
-            DiscordManager dMan = new DiscordManager();
+            DiscordManager dMan = new DiscordManager(client);
             JellyfinManager jMan = new JellyfinManager(config.GetVal("JELLYAPIKEY"), 
                 config.GetVal("JELLYURL"));
 
 
             jMan.QueryServerDevice();
 
-            Process process = new Process();
-            process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
-            process.Start();
+
 
             while (true)
             {
@@ -37,19 +40,14 @@ namespace JellyPresence.Project
                 }
 
                 jMan.QueryServer();
-                // Sleep the thread when changing activity values
-                // Otherwise protected memory clashes will happen
+
                 if (jMan.MissingFields()) { }
                 else
                 {
-                    string series = jMan.p.NowPlayingItem.SeriesName;
-                    string episode = jMan.p.NowPlayingItem.Name;
-                    long cur_pos = jMan.p.PlayState.PositionTicks;
-                    long runtime = jMan.p.NowPlayingItem.RunTimeTicks;
-                    dMan.SetActivity(client, "Watching " + series,
-                            "Episode: " + episode,
-                            cur_pos,
-                            runtime);
+                    dMan.SetActivity("Watching " + jMan.p.NowPlayingItem.SeriesName,
+                            "Episode: " + jMan.p.NowPlayingItem.Name,
+                            jMan.p.PlayState.PositionTicks,
+                            jMan.p.NowPlayingItem.RunTimeTicks);
                 }
                 Thread.Sleep(1000);
                 client.RunCallbacks();
