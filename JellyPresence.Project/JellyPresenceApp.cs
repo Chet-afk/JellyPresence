@@ -2,36 +2,60 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Timers;
+using Discord;
 
 namespace JellyPresence.Project
 {
     public class JellyPresenceApp
     {
 
-
         public static void Main()
         {
-            JellyPresence j = new JellyPresence();
-            JellyPresence.StartJMP();
+            Config config = new Config();
 
-            System.Timers.Timer t = new System.Timers.Timer(2000);
-            t.Elapsed += UpdateEvent;
-            t.AutoReset = true;
-            t.Start();
+            Discord.Discord client = new Discord.Discord(long.Parse(config.GetVal("CLIENTID")), 
+                (UInt64)Discord.CreateFlags.Default);
 
-            // Cant just check for JMP instances in the loop
-            // Discord will cause break by accessing protected memory 
-            while (true);
-        }
+            DiscordManager dMan = new DiscordManager();
+            JellyfinManager jMan = new JellyfinManager(config.GetVal("JELLYAPIKEY"), 
+                config.GetVal("JELLYURL"));
 
-        private static void UpdateEvent(Object s, ElapsedEventArgs e)
-        {
-            if (Process.GetProcessesByName("JellyfinMediaPlayer").Length == 0)
+
+
+
+            Process process = new Process();
+            process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
+            process.Start();
+
+            while (true)
             {
+                if (Process.GetProcessesByName("JellyfinMediaPlayer").Length == 0)
+                {
+                    client.Dispose();
+                    Environment.Exit(0);
+                }
 
-                Environment.Exit(0);
+                // Sleep the thread when changing activity values
+                // Otherwise protected memory clashes will happen
+                if (jMan.p == null || 
+                    jMan.p.NowPlayingItem.SeriesName == null || 
+                    jMan.p.NowPlayingItem.Name == null) { }
+                else
+                {
+                    dMan.SetActivity(client, "Watching " + jMan.p.NowPlayingItem.SeriesName,
+                            "Episode: " + jMan.p.NowPlayingItem.Name,
+                            jMan.p.PlayState.PositionTicks,
+                            jMan.p.NowPlayingItem.RunTimeTicks);
+                }
+                Thread.Sleep(500);
+                client.RunCallbacks();
+                Thread.Sleep(500);
+
+
+
             }
+
         }
+
     }
 }

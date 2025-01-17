@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System;
 using dotenv.net;
 using System.Timers;
+using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace JellyPresence.Project
@@ -18,13 +20,7 @@ namespace JellyPresence.Project
 
         public JellyPresence()
         {
-            envDict = DotEnv.Read();
-            if (!Config.envIntegrity(envDict))
-            {
-                throw new InvalidENVException("ENV Invalid");
-            }
 
-            discordManager = new DiscordManager(long.Parse(envDict["CLIENTID"]));
             jellyfinManager = new JellyfinManager(envDict["JELLYAPIKEY"], envDict["JELLYURL"]);
             UpdateInfo();
         }
@@ -40,22 +36,24 @@ namespace JellyPresence.Project
         // update discord activity stuff
         private void UpdateInfo()
         {
-            var timer = new Timer(1000);
-            timer.Elapsed += UpdateEvent;
-            timer.AutoReset = true;
-            timer.Start();
+            
+            while (true)
+            {
+                if (jellyfinManager.p == null) { }
+                else
+                {
+                    //discordManager.SetActivity("Watching " + jellyfinManager.p.NowPlayingItem.SeriesName,
+                    //    "Episode: " + jellyfinManager.p.NowPlayingItem.Name,
+                    //    jellyfinManager.p.PlayState.PositionTicks,
+                    //    jellyfinManager.p.NowPlayingItem.RunTimeTicks);
+                }
+                Thread.Sleep(1000);
+            }
         }
 
         private void UpdateEvent(Object s, ElapsedEventArgs e)
         {
-            if (jellyfinManager.p == null) { }
-            else
-            {
-                discordManager.SetActivity("Watching " + jellyfinManager.p.NowPlayingItem.SeriesName,
-                    "Episode: " + jellyfinManager.p.NowPlayingItem.Name,
-                    jellyfinManager.p.PlayState.PositionTicks,
-                    jellyfinManager.p.NowPlayingItem.RunTimeTicks);
-            }
+
             
         }
 

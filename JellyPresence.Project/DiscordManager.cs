@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using Discord;
 
@@ -6,56 +8,37 @@ namespace JellyPresence.Project
 {
     public class DiscordManager
     {
-        private Discord.Discord client;
-        private ActivityManager actManager;
-        private Activity activity = new Discord.Activity();
-        private ActivityTimestamps activityTimestamps = new ActivityTimestamps();
-        private ActivityAssets assets = new ActivityAssets();
         private DateTime epochStart = new DateTime(1970, 1, 1);
 
 
-        public DiscordManager(long ClientID)
+        public DiscordManager()
         {
-            // maybe change to json so dont gotta convert to long lol
-            client = new Discord.Discord(ClientID, (UInt64)Discord.CreateFlags.Default);
-            actManager = client.GetActivityManager();
-            actManager.UpdateActivity(activity, (res) =>
-            {
-            });
-
-            StartDiscordUpdate();
         }
 
         //TODO: Add image changing (once imgur api implemented?)
-        public void SetActivity(string showTitle, string userActivity,
+        public void SetActivity(Discord.Discord client, string showTitle, string userActivity,
             long currentTime, long runtime)
         {
+
+            ActivityManager actMan = client.GetActivityManager();
+
+            Activity activity = new Activity();
             activity.State = userActivity;
             activity.Details = showTitle;
 
-            long endTimeEpoch = (runtime - currentTime) / 10;
-            long currentTimeEpoch = (long)DateTime.UtcNow.Subtract(epochStart).TotalSeconds;
+            //long endTimeEpoch = (runtime - currentTime) / 10;
+            //long currentTimeEpoch = (long)DateTime.UtcNow.Subtract(epochStart).TotalSeconds;
 
-            activityTimestamps.End = endTimeEpoch + currentTimeEpoch;
+            //activityTimestamps.End = endTimeEpoch + currentTimeEpoch;
 
-            activity.Timestamps = activityTimestamps;
+            //activity.Timestamps = activityTimestamps;
 
-            actManager.UpdateActivity(activity, (res) =>
+
+
+            actMan.UpdateActivity(activity, (res) =>
             {
             });
-        }
-
-        private void StartDiscordUpdate()
-        {
-            var timer = new Timer(500);
-            timer.Elapsed += UpdateEvent;
-            timer.AutoReset = true;
-            timer.Start();
-        }
-
-        private void UpdateEvent(Object s, ElapsedEventArgs e)
-        {
-            client.RunCallbacks();
+            
         }
     }
 }
