@@ -18,6 +18,8 @@ namespace JellyPresence.Project
         private readonly string deviceName = Environment.MachineName;
         private string deviceJellyID;
 
+        private string title;
+
         private HttpClient client = new HttpClient(); 
 
 
@@ -58,15 +60,20 @@ namespace JellyPresence.Project
 
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(3));
+                await Task.Delay(TimeSpan.FromSeconds(1));
                 try
                 {
                     HttpResponseMessage r = await client.GetAsync(serverURL + "/Sessions?deviceId=" + deviceJellyID 
                         + "&apikey=" + APIKEY);
                     r.EnsureSuccessStatusCode();
                     string b = await r.Content.ReadAsStringAsync();
-                    Console.WriteLine(b);
 
+                    // I dont know why but the json is wrapped in an array of size 1 before getting
+                    // to the actual information. This just removes the array portion
+                    b = b.Substring(1, b.Length-2);
+                    
+                    PlaybackJSON p = JsonSerializer.Deserialize<PlaybackJSON>(b);
+                    Console.WriteLine(p.NowPlayingItem.Name + " " + p.PlayState.PositionTicks);
                 }
                 catch (HttpRequestException e)
                 {
@@ -86,5 +93,27 @@ namespace JellyPresence.Project
     {
         public string Name { get; set; }
         public string Id { get; set; }
+    }
+
+    // Classes for playback vals
+    public class PlaybackJSON
+    {
+        public PlaystateJSON PlayState { get; set; }
+        public NowPlayingItemJSON NowPlayingItem { get; set; }
+    }
+    public class PlaystateJSON
+    {
+        public long PositionTicks {  get; set; }
+        public bool IsPaused {  get; set; }
+    }
+    public class NowPlayingItemJSON
+    {
+        // Episode name
+        public string Name { get; set; }
+        public long RunTimeTicks { get; set; }
+        public string SeriesName { get; set; }
+        public string SeriesId {  get; set; }
+        // Just in case need it for later
+        //public string Id { get; set; }
     }
 }
