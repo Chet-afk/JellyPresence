@@ -18,7 +18,7 @@ namespace JellyPresence.Project
         private readonly string APIKEY;
         private readonly string serverURL;
         private readonly string deviceName = Environment.MachineName;
-        private string deviceJellyID;
+        private string deviceJellyID =  "";
 
         private readonly HttpRequestMessage getDevice;
         private HttpRequestMessage getInfo;
@@ -38,13 +38,13 @@ namespace JellyPresence.Project
         public bool MissingFields()
         {
             // True = not viewing anything / haven't claimed all info
-            if (p is null) {  return true; }
-            else if (p.PlayState is null || 
+            if (p is null ||
+                p.PlayState is null ||
                 p.NowPlayingItem is null ||
                 p.NowPlayingItem.SeriesName is null ||
                 p.NowPlayingItem.Name is null ||
                 p.NowPlayingItem.SeriesId is null ||
-                p.NowPlayingItem.RunTimeTicks == 0) { return true; }
+                p.NowPlayingItem.RunTimeTicks == 0) {  return true; }
             return false;
         }
 
@@ -84,6 +84,12 @@ namespace JellyPresence.Project
                 r.EnsureSuccessStatusCode();
                 string b = new StreamReader(r.Content.ReadAsStream()).ReadToEnd();
 
+                if (b == "[]")
+                {
+                    p = null; 
+                    return; 
+                }
+
                 // I dont know why but the json is wrapped in an array of size 1 before getting
                 // to the actual information. This just removes the array portion
                 b = b.Substring(1, b.Length - 2);
@@ -94,6 +100,10 @@ namespace JellyPresence.Project
             {
                 Console.WriteLine($"{e.Message}");
             }
+        }
+        public bool GetJellyID()
+        {
+            return deviceJellyID == "";
         }
     }
 

@@ -25,9 +25,10 @@ namespace JellyPresence.Project
             JellyfinManager jMan = new JellyfinManager(config.GetVal("JELLYAPIKEY"), 
                 config.GetVal("JELLYURL"));
 
-
-            jMan.QueryServerDevice();
-
+            while (jMan.GetJellyID())
+            {
+                jMan.QueryServerDevice();
+            }
 
 
             while (true)
@@ -41,11 +42,11 @@ namespace JellyPresence.Project
 
                 jMan.QueryServer();
 
-                if (jMan.MissingFields()) { }
+                if (jMan.MissingFields()) { dMan.SetActivity(); }
                 else
                 {
                     dMan.SetActivity("Watching " + jMan.p.NowPlayingItem.SeriesName,
-                            "Episode: " + jMan.p.NowPlayingItem.Name,
+                            jMan.p.NowPlayingItem.Name,
                             jMan.p.PlayState.PositionTicks,
                             jMan.p.NowPlayingItem.RunTimeTicks);
                 }

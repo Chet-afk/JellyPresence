@@ -33,12 +33,25 @@ namespace JellyPresence.Project
 
             activity.Timestamps = activityTimestamps;
 
-            Console.WriteLine(activity.Timestamps.End);
-
             actMan.UpdateActivity(activity, (res) =>
             {
             });
             
+        }
+
+        public void SetActivity()
+        {
+
+            activity.State = "";
+            activity.Details = "Idle";
+
+            activityTimestamps.End = 0;
+            activity.Timestamps = activityTimestamps;
+
+            actMan.UpdateActivity(activity, (res) =>
+            {
+            });
+
         }
     }
 }
