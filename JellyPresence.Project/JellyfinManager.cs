@@ -127,9 +127,8 @@ namespace JellyPresence.Project
     }
     public class PlaystateJSON
     {
-        // Ticks in jellyfin api calls are in microseconds
-        // but also multipled by 10 (idk why?????)
-        public long PositionTicks {  get; set; }
+        // 1 Tick = 100 Nanoseconds
+        public Int64 PositionTicks {  get; set; }
         public bool IsPaused { get; set; }
     }
     public class NowPlayingItemJSON
@@ -140,7 +139,7 @@ namespace JellyPresence.Project
         public string SeriesName { get; set; } = null;
 
         public string SeriesId { get; set; } = null;
-        public long RunTimeTicks { get; set; } = 0;
+        public Int64 RunTimeTicks { get; set; } = 0;
         
         // Just in case need it for later
         //public string Id { get; set; }

@@ -45,7 +45,7 @@ namespace JellyPresence.Project
                 if (jMan.MissingFields()) { dMan.SetActivity(); }
                 else
                 {
-                    dMan.SetActivity("Watching " + jMan.p.NowPlayingItem.SeriesName,
+                    dMan.SetActivity($"Watching {jMan.p.NowPlayingItem.SeriesName}",
                             jMan.p.NowPlayingItem.Name,
                             jMan.p.PlayState.PositionTicks,
                             jMan.p.NowPlayingItem.RunTimeTicks);
