@@ -1,8 +1,11 @@
 ﻿
 using System;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Threading;
-using Discord;
+using DiscordRPC;
+using DiscordRPC.Logging;
+
 
 namespace JellyPresence.Project
 {
@@ -18,8 +21,19 @@ namespace JellyPresence.Project
             process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
             process.Start();
 
-            Discord.Discord client = new Discord.Discord(long.Parse(config.GetVal("CLIENTID")), 
-                (UInt64)Discord.CreateFlags.Default);
+            DiscordRpcClient client = new DiscordRpcClient(config.GetVal("CLIENTID"));
+            client.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
+
+            client.OnReady += (sender, e) =>
+            {
+                Console.WriteLine("Received Ready from user {0}", e.User.Username);
+            };
+            client.OnPresenceUpdate += (sender, e) =>
+            {
+                Console.WriteLine("Received Update! {0}", e.Presence);
+            };
+            client.Initialize();
+
 
             DiscordManager dMan = new DiscordManager(client);
             JellyfinManager jMan = new JellyfinManager(config.GetVal("JELLYAPIKEY"), 
@@ -41,17 +55,16 @@ namespace JellyPresence.Project
                 }
 
                 jMan.QueryServer();
-
                 if (jMan.MissingFields()) { dMan.SetActivity(); }
                 else
                 {
+                    
                     dMan.SetActivity($"Watching {jMan.p.NowPlayingItem.SeriesName}",
                             jMan.p.NowPlayingItem.Name,
                             jMan.p.PlayState.PositionTicks,
                             jMan.p.NowPlayingItem.RunTimeTicks);
                 }
                 Thread.Sleep(1000);
-                client.RunCallbacks();
 
 
 

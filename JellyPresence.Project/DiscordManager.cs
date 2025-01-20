@@ -2,19 +2,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Discord;
+using DiscordRPC;
 
 namespace JellyPresence.Project
 {
     public class DiscordManager
     {
-        private DateTime epochStart = new DateTime(1970, 1, 1);
-        private ActivityManager actMan;
-        private Activity activity = new Activity();
+        DiscordRpcClient c;
 
-        public DiscordManager(Discord.Discord client)
+        public DiscordManager(DiscordRpcClient client)
         {
-            this.actMan = client.GetActivityManager();
+            c = client;
         }
 
         //TODO: Add image changing (once imgur api implemented?)
@@ -22,32 +20,39 @@ namespace JellyPresence.Project
             Int64 currentTime, Int64 runtime)
         {
 
-            activity.State = userActivity;
-            activity.Details = showTitle;
 
             Int64 endTimeEpoch = (Int64)(((runtime * 100) - (currentTime * 100)) / 1000000000);
-            Int64 currentTimeEpoch = (Int64)DateTime.UtcNow.Subtract(epochStart).TotalSeconds;
+            Int64 currentTimeEpoch = (Int64)DateTimeOffset.Now.ToUnixTimeSeconds();
+
+            DateTime end = DateTime.UnixEpoch.AddSeconds(endTimeEpoch + currentTimeEpoch);
 
 
-            activity.Timestamps.End = endTimeEpoch + currentTimeEpoch;
 
-            actMan.UpdateActivity(activity, (res) =>
+
+            Console.WriteLine($"{currentTimeEpoch} {endTimeEpoch} {endTimeEpoch + currentTimeEpoch}");
+
+
+            c.SetPresence(new RichPresence()
             {
+                State = userActivity,
+                Details = showTitle,
+                Timestamps = new Timestamps()
+                { End = end },
             });
-            
+
         }
 
         public void SetActivity()
         {
 
-            activity.State = "";
-            activity.Details = "Idle";
-
-
-            activity.Timestamps.End = 0;
-
-            actMan.UpdateActivity(activity, (res) =>
+            c.SetPresence(new RichPresence()
             {
+                State = "",
+                Details = "Idle",
+                Buttons = new Button[]
+                {
+                    new Button() { Label = "a", Url = "https://google.com" }
+                }
             });
 
         }

@@ -20,10 +20,9 @@ namespace JellyPresence.Project
         private readonly string deviceName = Environment.MachineName;
         private string deviceJellyID =  "";
 
-        private readonly HttpRequestMessage getDevice;
         private HttpRequestMessage getInfo;
 
-        public PlaybackJSON p;
+        public PlaybackJSON p = null;
 
         private HttpClient client = new HttpClient(); 
 
@@ -32,7 +31,7 @@ namespace JellyPresence.Project
         {
             APIKEY = apiKey;
             serverURL = jellyfinURL;
-            getDevice = new HttpRequestMessage(HttpMethod.Get, serverURL + "/Devices?apikey=" + APIKEY);
+            
         }
 
         public bool MissingFields()
@@ -52,6 +51,7 @@ namespace JellyPresence.Project
         {
             try
             {
+                HttpRequestMessage getDevice = new HttpRequestMessage(HttpMethod.Get, serverURL + "/Devices?apikey=" + APIKEY);
                 HttpResponseMessage r = client.Send(getDevice);
                 r.EnsureSuccessStatusCode();
                 string s = new StreamReader(r.Content.ReadAsStream()).ReadToEnd();
@@ -83,11 +83,11 @@ namespace JellyPresence.Project
                 HttpResponseMessage r = client.Send(getInfo);
                 r.EnsureSuccessStatusCode();
                 string b = new StreamReader(r.Content.ReadAsStream()).ReadToEnd();
-
+                
                 if (b == "[]")
                 {
-                    p = null; 
-                    return; 
+                    p = null;
+                    return;
                 }
 
                 // I dont know why but the json is wrapped in an array of size 1 before getting
@@ -96,7 +96,7 @@ namespace JellyPresence.Project
 
                 p = JsonSerializer.Deserialize<PlaybackJSON>(b);
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 Console.WriteLine($"{e.Message}");
             }
