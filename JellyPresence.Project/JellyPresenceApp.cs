@@ -45,6 +45,8 @@ namespace JellyPresence.Project
             }
 
 
+            Int64 ticks = -50000001;
+
             while (true)
             {
                 
@@ -55,15 +57,28 @@ namespace JellyPresence.Project
                 }
 
                 jMan.QueryServer();
-                if (jMan.MissingFields()) { dMan.SetActivity(); }
-                else
+
+                if (jMan.MissingFields()) { dMan.SetIdle(); ticks = -50000001; }
+
+                // Limits amount of SetPresence calls to every 5 seconds,
+                // or if user is jumping to different spots
+                else if (jMan.p.PlayState.PositionTicks > ticks + 50000000
+                    || jMan.p.PlayState.PositionTicks < ticks - 50000000)
                 {
-                    
-                    dMan.SetActivity($"Watching {jMan.p.NowPlayingItem.SeriesName}",
+
+                    dMan.SetActivity(jMan.p.NowPlayingItem.SeriesName,
                             jMan.p.NowPlayingItem.Name,
-                            jMan.p.PlayState.PositionTicks,
-                            jMan.p.NowPlayingItem.RunTimeTicks);
+                            jMan.p.PlayState.PositionTicks);
+
+                    ticks = jMan.p.PlayState.PositionTicks;
                 }
+
+                else if (jMan.p.PlayState.IsPaused)
+                {
+                    dMan.SetPaused(jMan.p.NowPlayingItem.SeriesName,
+                                     jMan.p.NowPlayingItem.Name);
+                }
+
                 Thread.Sleep(1000);
 
 
