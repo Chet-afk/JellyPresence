@@ -10,10 +10,13 @@ namespace JellyPresence.Project
     {
         DiscordRpcClient c;
         private Timestamps idle = new Timestamps(DateTime.UtcNow);
+        private RichPresence rp = new RichPresence() 
+        { 
+            Timestamps = new Timestamps()
+        };
+
         private bool isIdle = false;
         private bool isPaused = false;
-
-        Int64 ticks = -50000001; // Check for updates
 
         public DiscordManager(DiscordRpcClient client)
         {
@@ -30,15 +33,20 @@ namespace JellyPresence.Project
                 return;
             }
 
+            // Just to shorten variable names
+            Int64 curTicks = p.PlayState.PositionTicks;
+            NowPlayingItemJSON eData = p.NowPlayingItem;
+
             // Determine Rich Presence based on Type
             switch (p.NowPlayingItem.Type)
             {
                 case "Episode":
-                    SetEpisode(p.PlayState.PositionTicks, 
-                        p.NowPlayingItem.Name, p.NowPlayingItem.SeriesName);
+                    rp.Details = $"Watching {eData.SeriesName}";
+                    rp.State = eData.Name;
                     break;
                 case "Movie":
-                    SetMovie(p.PlayState.PositionTicks, p.NowPlayingItem.Name);
+                    rp.Details = $"Watching {eData.Name}";
+                    rp.State = null;
                     break;
                 case "Book":
                     break;
@@ -47,44 +55,21 @@ namespace JellyPresence.Project
                     return;
             }
 
+
+
+            DateTime start = DateTime.UtcNow.AddSeconds(0 - ((curTicks * 100) / 1000000000));
+
+            // Set Rich Presence details
+            rp.Timestamps.Start = start;
+            DateTime end = start.AddSeconds((eData.RunTimeTicks * 100) / 1000000000);
+            rp.Timestamps.End = end;
+            rp.Type = ActivityType.Watching;
+
+            c.SetPresence(rp);
+
             isIdle = false;
             isPaused = false;
             
-        }
-
-        private void SetEpisode(Int64 curTicks, string episodeName, string showTitle)
-        {
-
-            // Dont bother setting new presence if until 5 seconds have passed
-            // or user is clicking through video
-            if (curTicks < ticks + 50000000 && curTicks > ticks - 50000000) { return; }
-            
-            // I dont think discord does time left anymore lol, can't update that.
-            // Just use current time to show "how far" into it you are
-            DateTime secondsIn = DateTime.UtcNow.AddSeconds(0 - ((curTicks * 100) / 1000000000));
-
-            c.SetPresence(new RichPresence()
-            {
-                Details = $"Watching {showTitle}",
-                State = episodeName,
-                Timestamps = new Timestamps(secondsIn),
-                Type = ActivityType.Watching
-            });
-            ticks = curTicks;
-        }
-
-        private void SetMovie(Int64 curTicks, string Title)
-        {
-            if (curTicks < ticks + 50000000 && curTicks > ticks - 50000000) { return; }
-            DateTime secondsIn = DateTime.UtcNow.AddSeconds(0 - ((curTicks * 100) / 1000000000));
-
-            c.SetPresence(new RichPresence()
-            {
-                Details = $"Watching {Title}",
-                Timestamps = new Timestamps(secondsIn),
-                Type = ActivityType.Watching
-            });
-            ticks = curTicks;
         }
 
         //TODO: Add image changing (once imgur api implemented?)
@@ -115,6 +100,7 @@ namespace JellyPresence.Project
             });
 
             isPaused = true;
+            isIdle = false;
         }
 
 
@@ -124,7 +110,6 @@ namespace JellyPresence.Project
 
             // No need to constantly update if already idle.
             if (isIdle) { return; }
-            RichPresence a = new RichPresence();
             c.SetPresence(new RichPresence()
             {
                 State = "",
@@ -135,8 +120,6 @@ namespace JellyPresence.Project
 
             isIdle = true;
             isPaused = false;
-            ticks = -50000001;
-
         }
     }
 }

@@ -59,7 +59,7 @@ namespace JellyPresence.Project
                 }
 
                 
-                Thread.Sleep(1000);
+                Thread.Sleep(3000);
 
 
 
