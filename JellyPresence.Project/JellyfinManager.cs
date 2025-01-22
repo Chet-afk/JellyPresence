@@ -40,10 +40,7 @@ namespace JellyPresence.Project
             if (p is null ||
                 p.PlayState is null ||
                 p.NowPlayingItem is null ||
-                p.NowPlayingItem.SeriesName is null ||
-                p.NowPlayingItem.Name is null ||
-                p.NowPlayingItem.SeriesId is null ||
-                p.NowPlayingItem.RunTimeTicks == 0) {  return true; }
+                p.NowPlayingItem.Type is null) {  return true; }
             return false;
         }
 
@@ -123,7 +120,7 @@ namespace JellyPresence.Project
     public class PlaybackJSON
     {
         public PlaystateJSON PlayState { get; set; }
-        public NowPlayingItemJSON NowPlayingItem { get; set; }
+        public NowPlayingItemJSON NowPlayingItem { get; set; } = null;
     }
     public class PlaystateJSON
     {
@@ -140,6 +137,7 @@ namespace JellyPresence.Project
 
         public string SeriesId { get; set; } = null;
         public Int64 RunTimeTicks { get; set; } = 0;
+        public string Type {  get; set; } = null;
         
         // Just in case need it for later
         //public string Id { get; set; }

@@ -13,51 +13,111 @@ namespace JellyPresence.Project
         private bool isIdle = false;
         private bool isPaused = false;
 
+        Int64 ticks = -50000001; // Check for updates
+
         public DiscordManager(DiscordRpcClient client)
         {
             c = client;
         }
 
         //TODO: Add image changing (once imgur api implemented?)
-        public void SetActivity(string showTitle, string userActivity,
-            Int64 currentTime)
+        public void SetActivity(PlaybackJSON p)
         {
-
-            // I dont think discord does time left anymore lol, can't update that.
-            //long secondsToEnd = (((runtime * 100) - (currentTime * 100)) / 1000000000);
-            //DateTime end = DateTime.UtcNow.AddSeconds(secondsToEnd);
-
-            // Just use current time to show "how far" into it you are
-            DateTime secondsIn = DateTime.UtcNow.AddSeconds(0-((currentTime * 100) / 1000000000));
-
-
-            c.SetPresence(new RichPresence()
+            // Pause is by default false, so books etc wont ever be caught by this.
+            if (p.PlayState.IsPaused)
             {
-                State = userActivity,
-                Details = $"Watching {showTitle}",
-                Timestamps = new Timestamps(secondsIn)
-            });
+                SetPaused(p.NowPlayingItem);
+                return;
+            }
+
+            Console.WriteLine($"{p.NowPlayingItem.Type} {p.NowPlayingItem.Type == "Episode"}");
+            // Determine Rich Presence based on Type
+            switch (p.NowPlayingItem.Type)
+            {
+                case "Episode":
+                    SetEpisode(p.PlayState.PositionTicks, 
+                        p.NowPlayingItem.Name, p.NowPlayingItem.SeriesName);
+                    break;
+                case "Movie":
+                    SetMovie(p.PlayState.PositionTicks, p.NowPlayingItem.Name);
+                    break;
+                case "Book":
+                    break;
+
+                default: // Should never get here
+                    return;
+            }
 
             isIdle = false;
             isPaused = false;
             
         }
 
+        private void SetEpisode(Int64 curTicks, string episodeName, string showTitle)
+        {
+
+            // Dont bother setting new presence if until 5 seconds have passed
+            // or user is clicking through video
+            Console.WriteLine($"{curTicks} {ticks} {curTicks < ticks + 50000000} {curTicks > ticks - 50000000}");
+            if (curTicks < ticks + 50000000 && curTicks > ticks - 50000000) { return; }
+            
+            // I dont think discord does time left anymore lol, can't update that.
+            // Just use current time to show "how far" into it you are
+            DateTime secondsIn = DateTime.UtcNow.AddSeconds(0 - ((curTicks * 100) / 1000000000));
+
+            c.SetPresence(new RichPresence()
+            {
+                Details = $"Watching {showTitle}",
+                State = episodeName,
+                Timestamps = new Timestamps(secondsIn)
+            });
+            ticks = curTicks;
+        }
+
+        private void SetMovie(Int64 curTicks, string Title)
+        {
+            if (curTicks < ticks + 50000000 && curTicks > ticks - 50000000) { return; }
+            DateTime secondsIn = DateTime.UtcNow.AddSeconds(0 - ((curTicks * 100) / 1000000000));
+
+            c.SetPresence(new RichPresence()
+            {
+                Details = $"Watching {Title}",
+                Timestamps = new Timestamps(secondsIn)
+            });
+            ticks = curTicks;
+        }
+
         //TODO: Add image changing (once imgur api implemented?)
-        public void SetPaused(string showTitle, string userActivity)
+        private void SetPaused(NowPlayingItemJSON n)
         {
             if (isPaused) { return; }
+            string show;
+
+            switch(n.Type)
+            {
+                case ("Episode"):
+                    show = n.SeriesName;
+                    break;
+                case ("Movie"):
+                    show = n.Name;
+                    break;
+                default:
+                    show = "";
+                    break;
+            }
 
             // Set paused small image here probably
             c.SetPresence(new RichPresence()
             {
-                State = $"(Paused) {userActivity}",
-                Details = $"Watching {showTitle}"
+                Details = $"Watching {show}",
+                State = "(Paused)"
             });
 
             isPaused = true;
         }
 
+
+        // Functionally a reset 
         public void SetIdle()
         {
 
@@ -73,6 +133,7 @@ namespace JellyPresence.Project
 
             isIdle = true;
             isPaused = false;
+            ticks = -50000001;
 
         }
     }
