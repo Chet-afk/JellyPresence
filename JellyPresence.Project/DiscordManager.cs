@@ -67,7 +67,8 @@ namespace JellyPresence.Project
             {
                 Details = $"Watching {showTitle}",
                 State = episodeName,
-                Timestamps = new Timestamps(secondsIn)
+                Timestamps = new Timestamps(secondsIn),
+                Type = ActivityType.Watching
             });
             ticks = curTicks;
         }
@@ -80,7 +81,8 @@ namespace JellyPresence.Project
             c.SetPresence(new RichPresence()
             {
                 Details = $"Watching {Title}",
-                Timestamps = new Timestamps(secondsIn)
+                Timestamps = new Timestamps(secondsIn),
+                Type = ActivityType.Watching
             });
             ticks = curTicks;
         }
@@ -108,7 +110,8 @@ namespace JellyPresence.Project
             c.SetPresence(new RichPresence()
             {
                 Details = $"Watching {show}",
-                State = "(Paused)"
+                State = "(Paused)",
+                Type = ActivityType.Watching
             });
 
             isPaused = true;
@@ -121,12 +124,13 @@ namespace JellyPresence.Project
 
             // No need to constantly update if already idle.
             if (isIdle) { return; }
-
+            RichPresence a = new RichPresence();
             c.SetPresence(new RichPresence()
             {
                 State = "",
                 Details = "Idle",
-                Timestamps = idle
+                Timestamps = idle,
+                Type = ActivityType.Watching
             });
 
             isIdle = true;

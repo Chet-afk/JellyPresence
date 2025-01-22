@@ -17,7 +17,7 @@ As long as Jellyfin Media Player is running, JellyPresence will remain active an
 	<li> <h4> Create a Discord Application </h4></li>
 		<ol>
 			<li> <a href="https://discord.com/developers/applications"> Go to the Discord Developer Portal </a> </li>
-			<li> Create a new application, the name you give it will be what shows up on Discord as "Playing" </li>
+			<li> Create a new application, the name you give it will be what shows up on Discord as "Watching" </li>
 			<li> Copy the <strong> Application ID</strong> </li>
 		</ol>
 	<li> <h4> Create an API Key on Jellyfin Server </h4></li>

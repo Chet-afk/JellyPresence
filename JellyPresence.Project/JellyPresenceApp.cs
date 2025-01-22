@@ -23,7 +23,7 @@ namespace JellyPresence.Project
             process.Start();
 
             DiscordRpcClient client = new DiscordRpcClient(config.GetVal("CLIENTID"));
-
+            
             client.Initialize();
 
 
