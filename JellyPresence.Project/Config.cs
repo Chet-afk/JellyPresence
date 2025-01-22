@@ -15,7 +15,7 @@ namespace JellyPresence.Project
         public Config() 
         {
             envDict = DotEnv.Read();
-            if (!envIntegrity(envDict))
+            if (!envIntegrity())
             {
                 throw new InvalidENVException("ENV Invalid");
             }
@@ -24,8 +24,19 @@ namespace JellyPresence.Project
         /* 
          * Ensure all needed fields are filled 
          */
-        private static bool envIntegrity(IDictionary<string, string> _env)
+        private bool envIntegrity()
         {
+            try
+            {
+                string a = envDict["CLIENTID"];
+                string b = envDict["JELLYAPIKEY"];
+                string c = envDict["JELLYURL"];
+            }
+            catch (KeyNotFoundException e)
+            {
+                // Write stuff to a log eventually
+                return false;
+            }
             return true;
         }
 
@@ -35,9 +46,8 @@ namespace JellyPresence.Project
             {
                 return envDict[key];
             }
-            catch
+            catch (KeyNotFoundException e) 
             {
-                Console.WriteLine("Could not return value. Check to ensure key is correct");
                 return null;
             }
         }

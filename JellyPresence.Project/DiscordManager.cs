@@ -30,7 +30,6 @@ namespace JellyPresence.Project
                 return;
             }
 
-            Console.WriteLine($"{p.NowPlayingItem.Type} {p.NowPlayingItem.Type == "Episode"}");
             // Determine Rich Presence based on Type
             switch (p.NowPlayingItem.Type)
             {
@@ -58,7 +57,6 @@ namespace JellyPresence.Project
 
             // Dont bother setting new presence if until 5 seconds have passed
             // or user is clicking through video
-            Console.WriteLine($"{curTicks} {ticks} {curTicks < ticks + 50000000} {curTicks > ticks - 50000000}");
             if (curTicks < ticks + 50000000 && curTicks > ticks - 50000000) { return; }
             
             // I dont think discord does time left anymore lol, can't update that.

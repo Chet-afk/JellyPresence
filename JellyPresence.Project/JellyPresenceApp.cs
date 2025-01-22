@@ -15,23 +15,15 @@ namespace JellyPresence.Project
         public static void Main()
         {
 
+
             Config config = new Config();
 
             Process process = new Process();
-            process.StartInfo.FileName = "D:\\Jellyfin\\JellyfinMediaPlayer.exe";
+            process.StartInfo.FileName = config.GetVal("JELLYPATH");
             process.Start();
 
             DiscordRpcClient client = new DiscordRpcClient(config.GetVal("CLIENTID"));
-            client.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
 
-            client.OnReady += (sender, e) =>
-            {
-                Console.WriteLine("Received Ready from user {0}", e.User.Username);
-            };
-            client.OnPresenceUpdate += (sender, e) =>
-            {
-                Console.WriteLine("Received Update! {0}", e.Presence);
-            };
             client.Initialize();
 
 
