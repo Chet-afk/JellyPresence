@@ -4,11 +4,11 @@ Show what you are watching on Jellyfin as Rich Presence on Discord.
 As long as Jellyfin Media Player is running, JellyPresence will remain active and update your Discord status with whatever you are viewing. JellyPresence will terminate itself after Jellyfin Media Player closes, so you will never have to worry about it running while you are not viewing anything.
 
 # Requirements
-<a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0">.NET 9.x</a>
-<a href="https://jellyfin.org/downloads/server">Jellyfin Server</a>
-<a href="https://jellyfin.org/downloads">Jellyfin Media Player</a>
-<a href="https://discord.com/">Discord Client</a>
-<a href="https://discord.com/developers/applications">A Discord Application</a>
+<a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0">.NET 9.x</a> <br />
+<a href="https://jellyfin.org/downloads/server">Jellyfin Server</a><br />
+<a href="https://jellyfin.org/downloads">Jellyfin Media Player</a><br />
+<a href="https://discord.com/">Discord Client</a><br />
+<a href="https://discord.com/developers/applications">A Discord Application</a><br />
 ### Optional
 <a href="https://www.python.org/downloads/">Python 3.x </a>
 
