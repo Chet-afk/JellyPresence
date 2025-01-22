@@ -39,12 +39,10 @@ As long as Jellyfin Media Player is running, JellyPresence will remain active an
 				<ol>
 					<li> Create a file titled called ".env" in the same folder as JellyPresence.exe </li>
 					<li> Open the file with Notepad or your text editor of choice and enter the following information</li>
-					<code>
-					 CLIENTID="DISCORD APPLICATION ID"<br />
-					 JELLYAPIKEY="JELLYFIN API KEY"<br />
-					 JELLYURL="JELLYFIN URL"<br />
-					 JELLYPATH="FILE PATH TO JELLYFINMEDIAPLAYER.EXE"
-					 </code>
+<code>CLIENTID="DISCORD APPLICATION ID"</code><br />
+<code>JELLYAPIKEY="JELLYFIN API KEY"</code><br />
+<code>JELLYURL="JELLYFIN URL"</code><br />
+<code>JELLYPATH="FILE PATH TO JELLYFINMEDIAPLAYER.EXE"</code>
 					<li> Replace every quoted value with your own values</li>
 				</ol>
 		</ol>
@@ -52,4 +50,3 @@ As long as Jellyfin Media Player is running, JellyPresence will remain active an
 	<li> <h4> Launch JellyPresence instead of JMP whenever you want to use JMP</h4></li>
 </ol>
  
-
