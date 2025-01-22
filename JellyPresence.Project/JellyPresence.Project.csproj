@@ -5,9 +5,12 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
     <AssemblyName>JellyPresence</AssemblyName>
+    <ApplicationIcon>Ico\favicon.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Ico\favicon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
     <PackageReference Include="dotenv.net" Version="3.2.1" />
@@ -30,5 +33,8 @@
     <PackageReference Include="System.Text.Json" Version="9.0.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\publish\favicon\" />
   </ItemGroup>
 </Project>

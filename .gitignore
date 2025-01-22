@@ -4,6 +4,7 @@ obj/
 .idea/
 artifacts
 Properties/
+Ico/
 # Ignore NuGet Packages
 *.nupkg
 
